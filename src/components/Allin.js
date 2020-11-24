@@ -50,14 +50,14 @@ function Allin() {
           onKeyDown={toggleDrawer(anchor, false)}
         >
             <div style={{paddingLeft:"5%",fontWeight:"900",letterSpacing:"-1px"}}>
-            <Link to="/home" style={{textDecoration:"none",color:"black"}}><span>HOME</span></Link><br/>
+            <Link to="/" style={{textDecoration:"none",color:"black"}}><span>HOME</span></Link><br/>
             <Link to="/women" style={{textDecoration:"none",color:"black"}}><span>WOMAN</span></Link><br/>
             <Link to="/men" style={{textDecoration:"none",color:"black"}}><span>MAN</span></Link><br/>
             <Link to="/search" style={{textDecoration:"none",color:"black"}}><span>SEARCH</span></Link><br/>
             <Link to="/allproduct" style={{textDecoration:"none",color:"black"}}><span>ALL PRODUCTS</span></Link><br/><br/>
             <Link to="/cart" style={{textDecoration:"none",color:"black"}}><span>CART</span></Link><br/>
             <Link to="/profile" style={{textDecoration:"none",color:"black"}}><span>PROFILE</span></Link><br/>
-            <Link to="/" style={{textDecoration:"none",color:"black"}} onClick={()=>localStorage.clear()}><span>LOG-OUT</span></Link><br/>
+            <Link to="/" style={{textDecoration:"none",color:"black"}}><span>LOG-OUT</span></Link><br/>
          </div>
         </div>
       );

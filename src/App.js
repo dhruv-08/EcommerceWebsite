@@ -1,8 +1,11 @@
 import React from 'react';
 import './App.css';
+import Main from "./components/Main"
 import Login from "./components/Login"
 import Cart from "./components/Cart"
 import {Switch,Route} from 'react-router-dom'
+import ProductMen from "./components/ProductMen";
+import ProductWomen from "./components/ProductWomen";
 import Suc from "./components/Suc";
 import Profile from "./components/Profile";
 import Try from './components/Try';
@@ -36,7 +39,7 @@ function App() {
       <Route exact path="/men" component={()=><Mon/>}/>
       <Route exact path="/women" component={()=><Wom/>}/>
       <Route exact path="/allproduct" component={()=><Allin/>}/>
-      {/* <Route exact path="/productwomen" component={()=><ProductWomen/>}/> */}
+      <Route exact path="/productwomen" component={()=><ProductWomen/>}/>
       <Route exact path="/cart" component={()=><Cart/>}/>
       <Route exact path="/invoice" component={()=><Suc/>}/>
       <Route exact path="/profile" component={()=><Profile/>}/>

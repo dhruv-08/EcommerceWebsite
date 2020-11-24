@@ -3,6 +3,7 @@ import React from 'react'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import HomeIcon from '@material-ui/icons/Home';
+import Nav from './Nav'
 import SettingsIcon from '@material-ui/icons/Settings';
 import Detail from './Detail'
 import Address from './Address'

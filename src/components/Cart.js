@@ -3,6 +3,7 @@ import Axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import LocalMallIcon from '@material-ui/icons/LocalMall';
 import { Link } from 'react-router-dom';
+import Nav from './Nav'
 import FlipMove from 'react-flip-move';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 function Cart() {
@@ -107,7 +108,7 @@ function Cart() {
                 <br/><br/>
                 <span style={{fontSize:"15px",fontWeight:"lighter"}}>Delivery and taxes calculated in product price</span><br/><br/>
                 <Checkbox color="default" inputProps={{ 'aria-label': 'checkbox with default color' }} onChange={(e)=>handleChange(e)}/> <span style={{fontSize:"12px"}}>I have read and accepted the terms and conditions</span><br/><br/>
-                <Link to="/" style={{textDecoration:"none",paddingRight:""}}><Button variant="contained" color="primary" style={{width:"310px"}}>Contine Shopping</Button></Link>
+                <Link to="/home" style={{textDecoration:"none",paddingRight:""}}><Button variant="contained" color="primary" style={{width:"310px"}}>Contine Shopping</Button></Link>
                 </Grid>
                 <Grid item xs={2}>
                     <span style={{fontSize:"40px",letterSpacing:"5px",fontWeight:"lighter"}}>${total}</span><br/><br/><br/><br/><br/><br/><br/>

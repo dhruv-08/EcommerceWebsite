@@ -1,22 +1,34 @@
-import { Button, Card, CardActions, CardContent, CardMedia, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, Grid, IconButton, InputLabel, makeStyles, MenuItem, Select, TextField } from '@material-ui/core';
 import React, { useEffect, useState } from 'react'
-import ClearIcon from '@material-ui/icons/Clear';
-import all from "./Menwomen"
-import { Link } from 'react-router-dom';
-import Main from './Main';
+import LocalMallIcon from '@material-ui/icons/LocalMall';
+import Nav from "./Nav"
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import '../productmen.css'
+import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
+import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import IconButton from '@material-ui/core/IconButton';
+import Axios from 'axios';
+import { Button, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Slider, TextField, withStyles } from '@material-ui/core';
+import Dialog from '@material-ui/core/Dialog';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import ReactCircleColorPicker from 'react-circle-color-picker'
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
-import Axios from 'axios';
+import ValueLabel from "@material-ui/core/Slider/ValueLabel";
+import SentimentVeryDissatisfiedIcon from '@material-ui/icons/SentimentVeryDissatisfied';
+import FlipMove from 'react-flip-move';
+import men from "./Request"
+const StyledValueLabel = withStyles({
+    label: {
+      color:"black"
+    }
+  })(ValueLabel);
 const useStyles = makeStyles((theme) => ({
-    root: {
-      maxWidth: 345,
-      boxShadow:"0px 10px 30px -5px rgba(0, 0, 0, 0.5)"
-    },
     media: {
       height: 200,
-      paddingTop: '56.25%',
+      paddingTop: '56.25%', // 16:9
     },
     expand: {
       transform: 'rotate(0deg)',
@@ -29,12 +41,10 @@ const useStyles = makeStyles((theme) => ({
       transform: 'rotate(180deg)',
     },
   }));
-function Search() {
-    const classes = useStyles();
-    const [allpro, setallpro] = useState([]);
-    const [search, setsearch] = useState("");
+function ProductMen() {
     const [img, setimg] = useState([]);
     const [modal, setmodal] = useState([]);
+    const [allpro, setallpro] = useState([])
     const [open, setOpen] = React.useState(false);
     const [age, setAge] = React.useState('');
     const [age1, setAge1] = React.useState('');
@@ -43,106 +53,175 @@ function Search() {
     const [success, setsuccess] = useState(false);
     const [error, seterror] = useState(false);
     const [dat, setdat] = useState([]);
-    const handleClose = () => {
-      setOpen(false);
-    };
-    const handleChangee = (event) => {
-      setAge(event.target.value);
-      setsize(event.target.value);
-    };
-    const handleChange1 = (event) => {
-      setAge1(event.target.value);
-      setquantity(event.target.value);
-    };
-    function handleCart(pos){
-      var total=parseInt(pos.price);
-      var q=1;
-      var fit="L";
-        if(quantity!==""){
-          total=quantity*parseInt(pos.price);
-          q=quantity;
-        }
-        if(size!==""){
-            fit=size;
-        }
-        var arr=[{
-            "name":pos.name,
-            "sku":pos.name,
-            "total":total,
-            "price":parseInt(pos.price),
-            "currency":"USD",
-            "folder":pos.folder,
-            "size":fit,
-            "img":pos.image_1,
-            "quantity":q
-        }]
-        setquantity("");
-        var array=[];
-        for(var i=0;i<dat.length;i++){
-            array[i]=dat[i].folder;
-        }
-      if(!array.includes(pos.folder)){
-          Axios.post("/cart",{arr},{timeout:2000})
-          .then(res=>{
-              console.log("Done!!");
-          }).catch(err=>{
-              console.log(err);
-          })
-          setsuccess(true);
-          setTimeout(() => {
-              setsuccess(false);
-          }, 2000);
-      }
-      else{
-          seterror(true);
-          setTimeout(() => {
-              seterror(false);
-          }, 2000);
-      }
-  }
-    useEffect(() => {
-        async function fun(){
-            const val=all;
-            setallpro(val);
-            setimg(val);
-        }
-        fun();
-      }, [])
-    const handlesearch=(event)=>{
+    const [search, setsearch] = useState("")
+    const [volume, setvolume] = useState([30,120]);
+      const [value, setValue] = React.useState('');
+
+      const handleChange = (event) => {
+        setValue(event.target.value);
         var f=allpro.filter(menu=>{
             var t=(menu.name);
             return (t.toLowerCase().includes(event.target.value));
         });
         setimg(f);
-        setsearch(event.target.value);
-    }
-    const ProductDetail=(pos)=>{
+        console.log(f);
+      };
+const handlesearch=(event)=>{
+    var f=allpro.filter(menu=>{
+        var t=(menu.name);
+        return (t.toLowerCase().includes(event.target.value));
+    });
+    setimg(f);
+    setsearch(event.target.value);
+}
+  const handleChange1 = (event) => {
+    setAge1(event.target.value);
+    setquantity(event.target.value);
+  };
+  const handleChangee = (event) => {
+    setAge(event.target.value);
+    setsize(event.target.value);
+  };
+  function handleClickOpen(pos){
       setmodal(pos);
-      setOpen(true);
+    setOpen(true);
+  }
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleSlide=(event, newValue) => {
+      var mini=newValue[0];
+      var maxi=newValue[1];
+      
+      var array=[];
+      for(var i=0;i<allpro.length;i++){
+            var val=parseInt(allpro[i].price);
+            if(val>=mini && val<=maxi){
+                array.push(allpro[i]);
+            }
+      }
+    //   console.log(array);
+    setvolume(newValue);
+    setimg(array);
+  }
+  const classes = useStyles();
+  function handleCart(pos){
+    var total=parseInt(pos.price);
+    var q=1;
+    var fit="L";
+      if(quantity!==""){
+        total=quantity*parseInt(pos.price);
+        q=quantity;
+      }
+      if(size!==""){
+          fit=size;
+      }
+      var arr=[{
+          "name":pos.name,
+          "sku":pos.name,
+          "total":total,
+          "price":parseInt(pos.price),
+          "currency":"USD",
+          "folder":pos.folder,
+          "size":fit,
+          "img":pos.image_3,
+          "quantity":q
+      }]
+      setquantity("");
+      var array=[];
+      for(var i=0;i<dat.length;i++){
+          array[i]=dat[i].folder;
+      }
+    if(!array.includes(pos.folder)){
+        Axios.post("/cart",{arr},{timeout:2000})
+        .then(res=>{
+            console.log("Done!!");
+        }).catch(err=>{
+            console.log(err);
+        })
+        setsuccess(true);
+        setTimeout(() => {
+            setsuccess(false);
+        }, 2000);
     }
+    else{
+        seterror(true);
+        setTimeout(() => {
+            seterror(false);
+        }, 2000);
+    }
+}
+  useEffect(() => {
+    async function fun(){
+        const val=men;
+        setimg(val);
+        setallpro(val);
+    }
+    async function parashan(){
+        const u= await Axios.get("/cartDetail",{timeout:2000});
+        setdat(u.data.cart);
+    }
+    fun();
+    parashan();
+  }, [success])
     return (
         <div>
-            <Grid container>
-            <Grid item xs={2} style={{paddingTop:"1%"}}>
-              <img  src={process.env.PUBLIC_URL + `/image/logogo.png`}/>
+            <Nav check={true}/>
+            <div style={{paddingTop:"64px"}}>
+            <Grid container style={{height:"100%"}}>
+            <Grid item xs={2}></Grid>
+                <Grid item xs={3} style={{backgroundColor:"#a62c14",width:"360px",height:"660px",paddingLeft:"2%",position:"fixed"}}>
+                    <div ></div>
+                    <h1 style={{color:"white",fontWeight:"lighter",fontSize:"30px"}}>Categories :</h1>
+                    <FormControl component="fieldset">
+                    {/* <FormLabel component="legend">Gender</FormLabel> */}
+                    <RadioGroup aria-label="gender" name="gender1" value={value} onChange={handleChange}>
+                    <FormControlLabel value="" style={{color:"white"}} control={<Radio style={{color:"white"}}/>} label="All" />
+                    <FormControlLabel value="shirt" style={{color:"white"}} control={<Radio style={{color:"white"}}/>} label="Shirt" />
+                        <FormControlLabel value="t-shirt" style={{color:"white"}} control={<Radio style={{color:"white"}} />} label="T-shirt" />
+                        <FormControlLabel value="hoody" style={{color:"white"}} control={<Radio style={{color:"white"}} />} label="Hoody" />
+                        <FormControlLabel value="jacket"  style={{color:"white"}} control={<Radio style={{color:"white"}} />} label="Jacket" />
+                        <FormControlLabel value="short"  style={{color:"white"}} control={<Radio style={{color:"white"}} />} label="Shorts" />
+                        <FormControlLabel value="jean"  style={{color:"white"}} control={<Radio style={{color:"white"}} />} label="Jeans" />
+                    </RadioGroup>
+                    </FormControl>
+                    <h1 style={{color:"white",fontWeight:"lighter",fontSize:"30px"}}>Search :</h1>
+                    <TextField id="standard-basic" value={search} autoComplete="off" onChange={(e)=>handlesearch(e)} label="Search" InputProps={{style:{color:"white"}}} InputLabelProps={{style:{color:"white"}}} /><br/><br/>
+                    <h1 style={{color:"white",fontWeight:"lighter",fontSize:"30px"}}>Prize Range :</h1>
+                     <Slider value={volume} min={30} step={5} max={120} onChange={handleSlide} style={{color:"white",width:"250px"}} ValueLabelComponent={StyledValueLabel} valueLabelDisplay="auto" aria-labelledby="range-slider"/>
                 </Grid>
-                <Grid item xs={9} style={{paddingTop:"7%"}}>
-                    <TextField id="standard-basic" style={{width:"1050px",fontSize:"40px",textTransform:"uppercase"}} value={search} autoComplete="off" onChange={(e)=>handlesearch(e)} label="Search" InputProps={{style:{color:"black",fontSize:"40px",textTransform:"uppercase"}}} InputLabelProps={{style:{color:"transparent"}}} />
-                </Grid>
-                <Grid item xs={1} style={{paddingTop:"7%"}}>
-                  {search===""?<Link to="/"><ClearIcon style={{fontSize:"40px",paddingTop:"10%"}}/></Link>:<div></div>}
-                </Grid>
-            </Grid>
-            <Grid container>
-            {img.map(pos=>(<Grid key={pos.folder} item xs={3} style={{paddingLeft:"1%",paddingTop:"2%"}} data-aos="flip-right" data-aos-duration="800">
-                <img style={{width:"300px",height:"400px"}} src={process.env.PUBLIC_URL + `/image/${pos.folder}/${pos.image_1}`} onClick={()=>ProductDetail(pos)}/><br/>
-                            <span style={{fontSize:"15px"}}>{pos.name}</span><br/>
-                            <span style={{fontSize:"15px"}}>$ {pos.price}</span>
+                <Grid item xs={1}></Grid>
+                <Grid item xs={9}>
+                <div style={{paddingTop:"5%",paddingBottom:"5%",textAlign:"center"}}><span style={{fontSize:"40px",fontWeight:"lighter"}}>MEN <LocalMallIcon style={{fontSize:"30px"}}/></span></div>
+                    <Grid container className="promen">
+                    <FlipMove>
+                    {img.map(pos=>(<Grid key={pos.folder} item xs={3} style={{paddingLeft:"1%",paddingTop:"2%"}} >
+                        <Card className="cardmen" style={{ maxWidth:"345",boxShadow:"0px 10px 30px -5px rgba(0, 0, 0, 0.5)"}}>
+                            <CardMedia
+                                className={classes.media}
+                                image={process.env.PUBLIC_URL + `/image/${pos.folder}/${pos.image_1}`} alt={pos.name} onClick={()=>handleClickOpen(pos)}
+                            />
+                            <CardContent>
+                            <span>{pos.name}</span>
+                            </CardContent>
+                            <CardActions disableSpacing>
+                                <IconButton aria-label="Price">
+                                <span style={{color:"black"}}>${pos.price}</span>
+                                </IconButton>
+                                <IconButton aria-label="Add to cart" onClick={()=>handleCart(pos)}>
+                                <AddShoppingCartIcon style={{fontSize:"25px",color:"black"}} />
+                                </IconButton>
+                            </CardActions>
+                            </Card>
                         </Grid>))}
+                        </FlipMove>
+                        {img.length===0 && <h1 style={{fontWeight:"lighter",fontSize:"40px",paddingLeft:"39%",paddingTop:"13%"}}>Not Available <SentimentVeryDissatisfiedIcon style={{fontSize:"30px"}}/></h1>}
+                    </Grid>
+                </Grid>
             </Grid>
             <Dialog fullScreen open={open} onClose={handleClose}>
-                          <Link style={{textDecoration:"none",color:"black",padding:"1%"}} to="#" onClick={()=>setOpen(false)}><KeyboardBackspaceIcon style={{fontSize:"50px"}}/></Link>
-                         <div>
+                         <Nav check={true}/>
+                         <div style={{paddingTop:"60px"}}>
                          <Grid container>
                              <Grid item xs={6} >
                              <Carousel showThumbs={false} infiniteLoop={true} autoPlay>
@@ -203,7 +282,7 @@ function Search() {
                                     <span style={{fontSize:"40px"}}>Product Description</span><br/><br/>
                                     <span style={{letterSpacing:"1.5px",lineHeight:"1.5",fontSize:"20px"}}>{modal.description}</span><br/><br/>
                                     <Button variant="contained"
-                                        style={{ backgroundColor: "#111",color:"white",textAlign:"center",width:"600px",position:"absolute",bottom:"0" }}
+                                        style={{ backgroundColor: "#a62c14",color:"white",textAlign:"center",width:"600px",position:"absolute",bottom:"0" }}
                                         startIcon={<ShoppingCartIcon />} onClick={()=>handleCart(modal)}
                                     >
                                         ADD TO CART
@@ -211,7 +290,7 @@ function Search() {
                                  </div>
                              </Grid>
                              <Grid item xs={2}>
-                                 <div style={{width:"200px",height:"250px",backgroundColor:"#111",textAlign:"center",position:"absolute"}}>
+                                 <div style={{width:"200px",height:"250px",backgroundColor:"#a62c14",textAlign:"center",position:"absolute"}}>
                                     <span style={{color:"white",fontSize:"80px",position:"relative",top:"25%"}}>${modal.price}</span>
                                  </div>
                              </Grid>
@@ -266,8 +345,9 @@ function Search() {
                           </DialogContentText>
                           </DialogContent>
                       </Dialog>}
+            </div>
         </div>
     )
 }
 
-export default Search
+export default ProductMen
